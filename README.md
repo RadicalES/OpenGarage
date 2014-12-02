@@ -1,4 +1,4 @@
-OpenGarage
+# OpenGarage
 ==========
 Open Source Automatic Garage Door Controller
 By making use of Radical's ROBOT-T101 controller.
