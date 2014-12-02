@@ -1,19 +1,39 @@
-/*
- * inputs.c
+/**
+ * Simple Automatic Garage Door Controller
  *
- * Created: 2014/11/22 07:30:45 PM
- *  Author: JanZwiegers
+ * \file inputs.c
+ *
+ * \brief Opto Isolated and Digital Inputs
+ * Init, service and manage all inputs. RTC scheduler needs to service
+ * inputs on a regular interval.
+ *
+ * Copyright (C) 2014 Jan Zwiegers, jan@radialsystems.co.za
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <asf.h>
 #include "uart.h"
 #include "inputs.h"
 
-#define INPUT_DEBOUNCE 20 // 1000 ms
+#define INPUT_DEBOUNCE 20 //! 20 ms
+#define TRIGGER_DEBOUNCE 1000 //! 1 sec
 
-static uint16_t input_timers[8];
-static uint8_t input_status;
+static uint16_t input_timers[8]; //! debounce timers
+static uint8_t input_status; //! input last value
 
+/*! init inputs value and timers */
 void inputs_init( void )
 {
 	uint8_t c;
@@ -23,6 +43,7 @@ void inputs_init( void )
 	}
 }
 
+/*! combine inputs into a single byte */
 uint8_t inputs_get_value( void )
 {
 	uint8_t a = PINA & 0x0f;
@@ -32,6 +53,7 @@ uint8_t inputs_get_value( void )
 	return v;
 }
 
+/*! called by RTC */
 void inputs_service( uint8_t delay )
 {
 	uint8_t v = inputs_get_value();
@@ -98,6 +120,7 @@ void inputs_service( uint8_t delay )
 
 }
 
+/*! exported function */
 uint8_t inputs_get_status( void )
 {
 	uint8_t in = input_status;

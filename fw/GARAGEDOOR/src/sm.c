@@ -1,8 +1,25 @@
-/*
- * sm.c
+/**
+ * Simple Automatic Garage Door Controller
  *
- * Created: 2014/11/23 09:50:17 AM
- *  Author: JanZwiegers
+ * \file sm.c
+ *
+ * \brief State Machine
+ * This is the main logic engine of the garage door controller
+ *
+ * Copyright (C) 2014 Jan Zwiegers, jan@radialsystems.co.za
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <asf.h>
@@ -10,28 +27,29 @@
 #include "inputs.h"
 #include "relays.h"
 
-#define SM_LONG_DELAY 5000
-#define SM_SHORT_DELAY 2000
-#define SM_START_DELAY 5000
-#define SM_TIMEOUT 30000
+#define SM_LONG_DELAY 5000 //! 5 sec
+#define SM_SHORT_DELAY 2000 //! 2 sec
+#define SM_START_DELAY 5000 //! start up delay
+#define SM_TIMEOUT 30000 //! operation timeout
 
-#define SM_STATE_INIT 0
-#define SM_STATE_CLOSING 2
-#define SM_STATE_CLOSE_DELAY 3
-#define SM_STATE_CLOSED 4
-#define SM_STATE_OPENING 5
-#define SM_STATE_OPEN_DELAY 6
-#define SM_STATE_OPEN 7
-#define SM_STATE_MIDCLOSED_DELAY 8
-#define SM_STATE_MIDCLOSED 9
-#define SM_STATE_MIDOPEN_DELAY 10
-#define SM_STATE_MIDOPEN 11
+#define SM_STATE_INIT 0 //! initialize the SM
+#define SM_STATE_CLOSING 2 //! door closing operation
+#define SM_STATE_CLOSE_DELAY 3 //! end of closing, delay process
+#define SM_STATE_CLOSED 4 //! door closed state
+#define SM_STATE_OPENING 5 //! door is opening
+#define SM_STATE_OPEN_DELAY 6 //! door is open, delay process
+#define SM_STATE_OPEN 7 //! door open state
+#define SM_STATE_MIDCLOSED_DELAY 8 //! mid closed process delay
+#define SM_STATE_MIDCLOSED 9 //! door was closing and got stopped, next state will be opening
+#define SM_STATE_MIDOPEN_DELAY 10 //! mid open process delay
+#define SM_STATE_MIDOPEN 11 //! door was opening and got stopped
 
-static uint8_t sm_state;
-static uint16_t sm_timer;
-static uint16_t sm_timeout;
-static uint16_t sm_light_timer;
+static uint8_t sm_state; //! state machine state
+static uint16_t sm_timer; //! state machine timer
+static uint16_t sm_timeout; //! state machine timeout
+static uint16_t sm_light_timer; //! state machine light timer
 
+/*! initialize state machine */
 void sm_init( void )
 {
 	uint8_t v = inputs_get_value();
@@ -42,6 +60,7 @@ void sm_init( void )
 	relays_clr_channel();
 }
 
+/*! SM_STATE_INIT service routine */
 static uint8_t sm_state_init( void )
 {
 	if(sm_timer >= SM_START_DELAY) {
@@ -64,6 +83,7 @@ static uint8_t sm_state_init( void )
 	return SM_STATE_INIT;
 }
 
+/*! SM_STATE_OPEN service routine */
 static uint8_t sm_state_open( void )
 {
 	uint8_t in = inputs_get_status();
@@ -78,6 +98,7 @@ static uint8_t sm_state_open( void )
 	return SM_STATE_OPEN;
 }
 
+/*! SM_STATE_CLOSING service routine */
 static uint8_t sm_state_closing( void )
 {
 	uint8_t in = inputs_get_status();
@@ -101,6 +122,7 @@ static uint8_t sm_state_closing( void )
 	return SM_STATE_CLOSING;
 }
 
+/*! SM_STATE_CLOSED_DELAY service routine */
 static uint8_t sm_state_close_delay( void )
 {
 	if(sm_timer >= SM_LONG_DELAY ) {
@@ -109,6 +131,7 @@ static uint8_t sm_state_close_delay( void )
 	return SM_STATE_CLOSE_DELAY;
 }
 
+/*! SM_STATE_CLOSED service routine */
 static uint8_t sm_state_closed( void )
 {
 	uint8_t in = inputs_get_status();
@@ -123,6 +146,7 @@ static uint8_t sm_state_closed( void )
 	return SM_STATE_CLOSED;
 }
 
+/*! SM_STATE_OPENING service routine */
 static uint8_t sm_state_opening( void )
 {
 	uint8_t in = inputs_get_status();
@@ -146,6 +170,7 @@ static uint8_t sm_state_opening( void )
 	return SM_STATE_OPENING;
 }
 
+/*! SM_STATE_OPEN_DELAY service routine */
 static uint8_t sm_state_open_delay( void )
 {
 	if(sm_timer >= SM_LONG_DELAY ) {
@@ -154,6 +179,7 @@ static uint8_t sm_state_open_delay( void )
 	return SM_STATE_OPEN_DELAY;
 }
 
+/*! SM_STATE_MIDOPEN service routine */
 static uint8_t sm_state_midopen( void )
 {
 	uint8_t in = inputs_get_status();
@@ -168,6 +194,7 @@ static uint8_t sm_state_midopen( void )
 	return SM_STATE_MIDOPEN;
 }
 
+/*! SM_STATE_MIDOPEN_DELAY service routine */
 static uint8_t sm_state_midopen_delay( void )
 {
 	if(sm_timer >= SM_SHORT_DELAY ) {
@@ -177,6 +204,7 @@ static uint8_t sm_state_midopen_delay( void )
 	return SM_STATE_MIDOPEN_DELAY;
 }
 
+/*! SM_STATE_MIDCLOSED service routine */
 static uint8_t sm_state_midclosed( void )
 {
 	uint8_t in = inputs_get_status();
@@ -191,6 +219,7 @@ static uint8_t sm_state_midclosed( void )
 	return SM_STATE_MIDCLOSED;
 }
 
+/*! SM_STATE_MIDCLOSED_DELAY service routine */
 static uint8_t sm_state_midclosed_delay( void )
 {
 	if(sm_timer >= SM_SHORT_DELAY ) {
@@ -200,6 +229,7 @@ static uint8_t sm_state_midclosed_delay( void )
 	return SM_STATE_MIDCLOSED_DELAY;
 }
 
+/*! state machine execution routine, called by RTC scheduler */
 void sm_service( uint8_t delay )
 {
 	uint8_t s = sm_state;
@@ -244,6 +274,7 @@ void sm_service( uint8_t delay )
 		break;
 	}
 
+	//! Print a change of state
 	if(sm_state != s) {
 		uart_write_string("COS: ");
 		uart_print_byte(sm_state);

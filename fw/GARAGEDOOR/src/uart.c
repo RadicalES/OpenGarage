@@ -1,39 +1,56 @@
-/*
- * uart.c
+/**
+ * Simple Automatic Garage Door Controller
  *
- * Created: 2014/11/21 10:15:52 PM
- *  Author: JanZwiegers
+ * \file uart.c
+ *
+ * \brief UART interface
+ * Init & cont
+ *
+ * Copyright (C) 2014 Jan Zwiegers, jan@radialsystems.co.za
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <asf.h>
 
 #define BAUD_PRESCALE(BAUD) (((F_CPU / (BAUD * 16UL))) - 1)
-//#define USART_BAUDRATE 38400
-//#define BAUD_PRESCALE (((F_CPU / (USART_BAUDRATE * 16UL))) - 1)
 
 //! ASCII representation of hexadecimal digits.
 static const char HEX_DIGITS[16] = "0123456789ABCDEF";
 
+/*! setup uart registers */
 void uart_init( uint16_t buadrate )
 {
 	// Set baud rate
 	UBRRL = BAUD_PRESCALE(buadrate);// Load lower 8-bits into the low byte of the UBRR register
 	UBRRH = (BAUD_PRESCALE(buadrate) >> 8);
 
-	// Enable receiver and transmitter and receive complete interrupt
+	// Enable receiver and transmitter
 	//UCSRB = ((1<<TXEN)|(1<<RXEN) | (1<<RXCIE));
 	UCSRB = ((1<<TXEN)|(1<<RXEN));
 
 	//UCSRC = (1 << URSEL) | (1 << UCSZ0) | (1 << UCSZ1); // Use 8-bit character sizes
 }
 
-
+/*! output a single character */
 void uart_write_char( char c )
 {
-	while ((UCSRA & (1 << UDRE)) == 0) {}; // Do nothing until UDR is ready for more data to be written to it
-	UDR = c;//ReceivedByte; // Echo back the received byte back to the computer
+	while ((UCSRA & (1 << UDRE)) == 0) {}; //wait for last TX char to exit
+	UDR = c;
 }
 
+/*! output a text string until end of string is reached  */
 void uart_write_string( char *str )
 {
 	while(*str != '\0') {
@@ -42,6 +59,7 @@ void uart_write_string( char *str )
 	}
 }
 
+/*! convert a byte to string and output */
 void uart_print_byte( uint8_t b )
 {
 	char tmp[4];
@@ -58,6 +76,7 @@ void uart_print_byte( uint8_t b )
 	uart_write_string(tmp + i);
 }
 
+/*! convert a byte to hex and output */
 void uart_print_byte_hex( uint8_t b )
 {
 	char tmp[3];
