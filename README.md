@@ -1,4 +1,4 @@
 OpenGarage
 ==========
 
-Open source garage automatic garage controller
+Open source automatic garage door controller
