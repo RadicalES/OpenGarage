@@ -14,7 +14,5 @@ src\sm.c
 
 src\uart.c
 
-src\asf\mega\boards\stk600\rcx_x\init.c
-
 src\main.c
 

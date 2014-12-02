@@ -5,7 +5,8 @@
  *
  * \brief Main source file
  *
- * Copyright (C) 2014 Jan Zwiegers, jan@radialsystems.co.za
+ * Copyright (C) 2014 Radical Electronic Systems
+ * Written by Jan Zwiegers, jan@radialsystems.co.za
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,11 +31,26 @@
 
 #define BAUDRATE 38400 //! Serial port baudrate for debugging
 
+static void port_init( void )
+{
+	// relay output pins - PD4-7
+	DDRD = 0xf0;
+	PORTD = 0x00;
+
+	// LEDs output pins - PB4-7
+	DDRB = 0xf0;
+	PORTB = 0x00;
+
+	// PA0-3 digital inputs - enable pull ups
+	PORTA = 0x0f;
+}
+
 /*! main start */
 int main (void)
 {
 	cpu_irq_disable();
-	board_init();
+	sysclk_init();
+	port_init();
 	uart_init(BAUDRATE);
 	rtc_init();
 	relays_init();

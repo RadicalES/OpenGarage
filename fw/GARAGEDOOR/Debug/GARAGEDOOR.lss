@@ -3,33 +3,33 @@ GARAGEDOOR.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         00000818  00000000  00000000  00000094  2**1
+  0 .text         00000814  00000000  00000000  00000094  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         000000aa  00800060  00000818  000008ac  2**0
+  1 .data         000000aa  00800060  00000814  000008a8  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  2 .bss          0000001e  0080010a  0080010a  00000956  2**0
+  2 .bss          0000001e  0080010a  0080010a  00000952  2**0
                   ALLOC
-  3 .stab         000006cc  00000000  00000000  00000958  2**2
+  3 .stab         000006cc  00000000  00000000  00000954  2**2
                   CONTENTS, READONLY, DEBUGGING
-  4 .stabstr      00000085  00000000  00000000  00001024  2**0
+  4 .stabstr      00000085  00000000  00000000  00001020  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_aranges 00000230  00000000  00000000  000010b0  2**3
+  5 .debug_aranges 00000210  00000000  00000000  000010a8  2**3
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   00000fc5  00000000  00000000  000012e0  2**0
+  6 .debug_info   00000f69  00000000  00000000  000012b8  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00000615  00000000  00000000  000022a5  2**0
+  7 .debug_abbrev 00000610  00000000  00000000  00002221  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00002caf  00000000  00000000  000028ba  2**0
+  8 .debug_line   000028d2  00000000  00000000  00002831  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  000002c0  00000000  00000000  0000556c  2**2
+  9 .debug_frame  0000029c  00000000  00000000  00005104  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    000004b3  00000000  00000000  0000582c  2**0
+ 10 .debug_str    0000043a  00000000  00000000  000053a0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    0000069c  00000000  00000000  00005cdf  2**0
+ 11 .debug_loc    0000069c  00000000  00000000  000057da  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_macinfo 0005abc6  00000000  00000000  0000637b  2**0
+ 12 .debug_macinfo 0004fc8d  00000000  00000000  00005e76  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_ranges 00000128  00000000  00000000  00060f41  2**0
+ 13 .debug_ranges 00000118  00000000  00000000  00055b03  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -90,7 +90,7 @@ Disassembly of section .text:
   60:	11 e0       	ldi	r17, 0x01	; 1
   62:	a0 e6       	ldi	r26, 0x60	; 96
   64:	b0 e0       	ldi	r27, 0x00	; 0
-  66:	e8 e1       	ldi	r30, 0x18	; 24
+  66:	e4 e1       	ldi	r30, 0x14	; 20
   68:	f8 e0       	ldi	r31, 0x08	; 8
   6a:	02 c0       	rjmp	.+4      	; 0x70 <__do_copy_data+0x10>
   6c:	05 90       	lpm	r0, Z+
@@ -112,18 +112,24 @@ Disassembly of section .text:
   80:	a8 32       	cpi	r26, 0x28	; 40
   82:	b1 07       	cpc	r27, r17
   84:	e1 f7       	brne	.-8      	; 0x7e <.do_clear_bss_loop>
-  86:	80 d3       	rcall	.+1792   	; 0x788 <main>
-  88:	c5 c3       	rjmp	.+1930   	; 0x814 <_exit>
+  86:	77 d3       	rcall	.+1774   	; 0x776 <main>
+  88:	c3 c3       	rjmp	.+1926   	; 0x810 <_exit>
 
 0000008a <__bad_interrupt>:
   8a:	ba cf       	rjmp	.-140    	; 0x0 <__vectors>
 
 0000008c <sysclk_init>:
+	if ((CONFIG_SYSCLK_PSDIV != SYSCLK_PSDIV_8) ||
+			(SYSCLK_PSDIV_8 != CLKPR)) {
+		sysclk_set_prescalers(CONFIG_SYSCLK_PSDIV);
+	}
+#endif
+}
   8c:	08 95       	ret
 
 0000008e <inputs_init>:
-static uint8_t input_status;
 
+/*! init inputs value and timers */
 void inputs_init( void )
 {
 	uint8_t c;
@@ -153,6 +159,7 @@ void inputs_init( void )
 
 000000d4 <inputs_get_value>:
 
+/*! combine inputs into a single byte */
 uint8_t inputs_get_value( void )
 {
 	uint8_t a = PINA & 0x0f;
@@ -161,8 +168,8 @@ uint8_t inputs_get_value( void )
   d6:	20 b3       	in	r18, 0x10	; 16
 	uint8_t b = PINB & 0x03;
   d8:	96 b3       	in	r25, 0x16	; 22
-}
 
+/*! combine inputs into a single byte */
 uint8_t inputs_get_value( void )
 {
 	uint8_t a = PINA & 0x0f;
@@ -181,6 +188,7 @@ uint8_t inputs_get_value( void )
 
 000000e8 <inputs_service>:
 
+/*! called by RTC */
 void inputs_service( uint8_t delay )
 {
   e8:	1f 93       	push	r17
@@ -392,9 +400,9 @@ uint8_t inputs_get_status( void )
  25c:	08 95       	ret
 
 0000025e <relays_set_outputs>:
+static volatile uint8_t relays; //! relays local status
 
-static volatile uint8_t relays;
-
+/*! control relays pins on various ports */
 void relays_set_outputs( uint8_t value )
 {
 	relays = value;
@@ -417,6 +425,7 @@ void relays_set_outputs( uint8_t value )
 
 0000027a <relays_set_channel>:
 
+/*! switch a relay channel on */
 void relays_set_channel( uint8_t index )
 {
  27a:	cf 93       	push	r28
@@ -434,9 +443,9 @@ void relays_set_channel( uint8_t index )
  28e:	55 1f       	adc	r21, r21
  290:	8a 95       	dec	r24
  292:	e2 f7       	brpl	.-8      	; 0x28c <relays_set_channel+0x12>
-	PORTB = value & 0xf0;
 }
 
+/*! switch a relay channel on */
 void relays_set_channel( uint8_t index )
 {
 	uint8_t r = relays & 0xcc;
@@ -498,7 +507,7 @@ void relays_set_channel( uint8_t index )
 }
  2d4:	80 91 1b 01 	lds	r24, 0x011B
 
-
+/*! init relays interface */
 void relays_init()
 {
 	relays = 0x00;
@@ -507,9 +516,9 @@ void relays_init()
 
 000002da <relays_toggle_run>:
  2da:	80 91 1b 01 	lds	r24, 0x011B
-	return relays;
-}
-
+ *! we use this to show the activity of the state machine by toggeling
+ *! it every 500 ms
+ */
 uint8_t relays_toggle_run( void )
 {
 	uint8_t r = relays & 0x80;
@@ -531,10 +540,10 @@ uint8_t relays_toggle_run( void )
  2f2:	b5 cf       	rjmp	.-150    	; 0x25e <relays_set_outputs>
 
 000002f4 <__vector_3>:
+static volatile uint32_t rtc_ticks; //! ticks since boot
+static volatile uint8_t rtc_events; //! indicate a tick event
 
-static volatile uint32_t rtc_ticks;
-static volatile uint8_t rtc_events;
-
+/*! RTC interrupt */
 ISR(TIMER2_COMP_vect)
 {
  2f4:	1f 92       	push	r1
@@ -575,6 +584,7 @@ ISR(TIMER2_COMP_vect)
 
 00000348 <rtc_init>:
 
+/*! init RTC system */
 void rtc_init()
 {
 	// setup clock, pre-scaled 64, CTC mode
@@ -600,6 +610,7 @@ void rtc_init()
 
 00000364 <rtc_start>:
 
+/*! start RTC system */
 void rtc_start()
 {
 	TCNT2 = 0;
@@ -617,11 +628,11 @@ void rtc_start()
  372:	08 95       	ret
 
 00000374 <rtc_service>:
-
+/*! endless loop to service RTC events*/
 void rtc_service( void )
 {
 	while(1) {
-		if(rtc_events > 0) {
+		if(rtc_events > 0) { // only execute when need to
 			if((rtc_ticks % 500) == 0) { // 1/2 sec tick
  374:	0f 2e       	mov	r0, r31
  376:	f4 ef       	ldi	r31, 0xF4	; 244
@@ -635,7 +646,7 @@ void rtc_service( void )
  386:	f0 2d       	mov	r31, r0
 				relays_toggle_run();
 			}
-			else if((rtc_ticks % 10) == 2) { // 10 ms tick at 2 interfval
+			else if((rtc_ticks % 10) == 2) { // 10 ms tick at 2 interval
  388:	0f 2e       	mov	r0, r31
  38a:	fa e0       	ldi	r31, 0x0A	; 10
  38c:	cf 2e       	mov	r12, r31
@@ -646,12 +657,12 @@ void rtc_service( void )
  396:	f0 e0       	ldi	r31, 0x00	; 0
  398:	ff 2e       	mov	r15, r31
  39a:	f0 2d       	mov	r31, r0
-}
 
+/*! endless loop to service RTC events*/
 void rtc_service( void )
 {
 	while(1) {
-		if(rtc_events > 0) {
+		if(rtc_events > 0) { // only execute when need to
  39c:	80 91 1c 01 	lds	r24, 0x011C
  3a0:	88 23       	and	r24, r24
  3a2:	e1 f3       	breq	.-8      	; 0x39c <rtc_service+0x28>
@@ -662,7 +673,7 @@ void rtc_service( void )
  3b0:	90 91 20 01 	lds	r25, 0x0120
  3b4:	a5 01       	movw	r20, r10
  3b6:	94 01       	movw	r18, r8
- 3b8:	0b d2       	rcall	.+1046   	; 0x7d0 <__udivmodsi4>
+ 3b8:	09 d2       	rcall	.+1042   	; 0x7cc <__udivmodsi4>
  3ba:	dc 01       	movw	r26, r24
  3bc:	cb 01       	movw	r24, r22
  3be:	00 97       	sbiw	r24, 0x00	; 0
@@ -674,13 +685,13 @@ void rtc_service( void )
  3c8:	32 c0       	rjmp	.+100    	; 0x42e <rtc_service+0xba>
  3ca:	60 91 1d 01 	lds	r22, 0x011D
 			}
-			else if((rtc_ticks % 10) == 2) { // 10 ms tick at 2 interfval
+			else if((rtc_ticks % 10) == 2) { // 10 ms tick at 2 interval
  3ce:	70 91 1e 01 	lds	r23, 0x011E
  3d2:	80 91 1f 01 	lds	r24, 0x011F
  3d6:	90 91 20 01 	lds	r25, 0x0120
  3da:	a7 01       	movw	r20, r14
  3dc:	96 01       	movw	r18, r12
- 3de:	f8 d1       	rcall	.+1008   	; 0x7d0 <__udivmodsi4>
+ 3de:	f6 d1       	rcall	.+1004   	; 0x7cc <__udivmodsi4>
  3e0:	dc 01       	movw	r26, r24
  3e2:	cb 01       	movw	r24, r22
  3e4:	82 30       	cpi	r24, 0x02	; 2
@@ -700,7 +711,7 @@ void rtc_service( void )
  400:	90 91 20 01 	lds	r25, 0x0120
  404:	a7 01       	movw	r20, r14
  406:	96 01       	movw	r18, r12
- 408:	e3 d1       	rcall	.+966    	; 0x7d0 <__udivmodsi4>
+ 408:	e1 d1       	rcall	.+962    	; 0x7cc <__udivmodsi4>
  40a:	dc 01       	movw	r26, r24
  40c:	cb 01       	movw	r24, r22
  40e:	84 30       	cpi	r24, 0x04	; 4
@@ -722,9 +733,9 @@ void rtc_service( void )
  432:	b4 cf       	rjmp	.-152    	; 0x39c <rtc_service+0x28>
 
 00000434 <sm_init>:
-static uint16_t sm_timeout;
-static uint16_t sm_light_timer;
+static uint16_t sm_light_timer; //! state machine light timer
 
+/*! initialize state machine */
 void sm_init( void )
 {
 	uint8_t v = inputs_get_value();
@@ -746,7 +757,7 @@ void sm_init( void )
 	relays_clr_channel();
  454:	cf 93       	push	r28
  456:	c0 91 21 01 	lds	r28, 0x0121
-
+/*! state machine execution routine, called by RTC scheduler */
 void sm_service( uint8_t delay )
 {
 	uint8_t s = sm_state;
@@ -807,9 +818,9 @@ void sm_service( uint8_t delay )
  4cc:	09 f0       	breq	.+2      	; 0x4d0 <__stack+0x71>
  4ce:	9e c0       	rjmp	.+316    	; 0x60c <__stack+0x1ad>
  4d0:	8e c0       	rjmp	.+284    	; 0x5ee <__stack+0x18f>
-	return SM_STATE_CLOSE_DELAY;
 }
 
+/*! SM_STATE_CLOSED service routine */
 static uint8_t sm_state_closed( void )
 {
 	uint8_t in = inputs_get_status();
@@ -838,9 +849,9 @@ static uint8_t sm_state_closed( void )
 		s = sm_state_closed();
 		break;
  4f2:	80 ff       	sbrs	r24, 0
-	return SM_STATE_OPEN;
 }
 
+/*! SM_STATE_CLOSING service routine */
 static uint8_t sm_state_closing( void )
 {
 	uint8_t in = inputs_get_status();
@@ -896,9 +907,9 @@ static uint8_t sm_state_closing( void )
 		s = sm_state_closing();
 		break;
  540:	c4 e0       	ldi	r28, 0x04	; 4
-	return SM_STATE_CLOSING;
 }
 
+/*! SM_STATE_CLOSED_DELAY service routine */
 static uint8_t sm_state_close_delay( void )
 {
 	if(sm_timer >= SM_LONG_DELAY ) {
@@ -914,9 +925,9 @@ static uint8_t sm_state_close_delay( void )
 		s = sm_state_close_delay();
 		break;
  54e:	10 92 22 01 	sts	0x0122, r1
-	return SM_STATE_INIT;
 }
 
+/*! SM_STATE_OPEN service routine */
 static uint8_t sm_state_open( void )
 {
 	uint8_t in = inputs_get_status();
@@ -943,9 +954,9 @@ static uint8_t sm_state_open( void )
 		s = sm_state_open();
 		break;
  570:	9f de       	rcall	.-706    	; 0x2b0 <relays_clr_channel>
-	return SM_STATE_CLOSED;
 }
 
+/*! SM_STATE_OPENING service routine */
 static uint8_t sm_state_opening( void )
 {
 	uint8_t in = inputs_get_status();
@@ -1003,9 +1014,9 @@ static uint8_t sm_state_opening( void )
 		s = sm_state_opening();
 		break;
  5be:	43 c0       	rjmp	.+134    	; 0x646 <__stack+0x1e7>
-	return SM_STATE_OPENING;
 }
 
+/*! SM_STATE_OPEN_DELAY service routine */
 static uint8_t sm_state_open_delay( void )
 {
 	if(sm_timer >= SM_LONG_DELAY ) {
@@ -1016,9 +1027,9 @@ static uint8_t sm_state_open_delay( void )
  5c8:	3e c0       	rjmp	.+124    	; 0x646 <__stack+0x1e7>
 		return SM_STATE_OPEN;
  5ca:	10 92 23 01 	sts	0x0123, r1
-	return SM_STATE_MIDCLOSED;
 }
 
+/*! SM_STATE_MIDCLOSED_DELAY service routine */
 static uint8_t sm_state_midclosed_delay( void )
 {
 	if(sm_timer >= SM_SHORT_DELAY ) {
@@ -1032,9 +1043,9 @@ static uint8_t sm_state_midclosed_delay( void )
 		s = sm_state_midclosed_delay();
 		break;
  5da:	80 e0       	ldi	r24, 0x00	; 0
-	return SM_STATE_MIDOPEN_DELAY;
 }
 
+/*! SM_STATE_MIDCLOSED service routine */
 static uint8_t sm_state_midclosed( void )
 {
 	uint8_t in = inputs_get_status();
@@ -1064,9 +1075,9 @@ static uint8_t sm_state_midclosed( void )
 		s = sm_state_midclosed();
 		break;
  5fc:	10 92 25 01 	sts	0x0125, r1
-	return SM_STATE_MIDOPEN;
 }
 
+/*! SM_STATE_MIDOPEN_DELAY service routine */
 static uint8_t sm_state_midopen_delay( void )
 {
 	if(sm_timer >= SM_SHORT_DELAY ) {
@@ -1081,9 +1092,9 @@ static uint8_t sm_state_midopen_delay( void )
 		s = sm_state_midopen_delay();
 		break;
  608:	c2 e0       	ldi	r28, 0x02	; 2
-	return SM_STATE_OPEN_DELAY;
 }
 
+/*! SM_STATE_MIDOPEN service routine */
 static uint8_t sm_state_midopen( void )
 {
 	uint8_t in = inputs_get_status();
@@ -1114,9 +1125,9 @@ static uint8_t sm_state_midopen( void )
 		s = sm_state_midopen();
 		break;
  62a:	8c e9       	ldi	r24, 0x9C	; 156
-	relays_clr_channel();
 }
 
+/*! SM_STATE_INIT service routine */
 static uint8_t sm_state_init( void )
 {
 	if(sm_timer >= SM_START_DELAY) {
@@ -1173,18 +1184,26 @@ static uint8_t sm_state_init( void )
 			return SM_STATE_CLOSED;
  668:	36 d0       	rcall	.+108    	; 0x6d6 <uart_write_string>
  66a:	c0 93 21 01 	sts	0x0121, r28
-	default:
 		s = sm_state_init();
 		break;
 	}
 
+	//! Print a change of state
 	if(sm_state != s) {
  66e:	cf 91       	pop	r28
  670:	08 95       	ret
 
 00000672 <uart_init>:
+//! ASCII representation of hexadecimal digits.
+static const char HEX_DIGITS[16] = "0123456789ABCDEF";
+
+/*! setup uart registers */
+void uart_init( uint16_t buadrate )
+{
  672:	0f 93       	push	r16
  674:	1f 93       	push	r17
+	// Set baud rate
+	UBRRL = BAUD_PRESCALE(buadrate);// Load lower 8-bits into the low byte of the UBRR register
  676:	a0 e0       	ldi	r26, 0x00	; 0
  678:	b0 e0       	ldi	r27, 0x00	; 0
  67a:	88 0f       	add	r24, r24
@@ -1209,13 +1228,14 @@ static uint8_t sm_state_init( void )
  6a0:	72 e1       	ldi	r23, 0x12	; 18
  6a2:	8a e7       	ldi	r24, 0x7A	; 122
  6a4:	90 e0       	ldi	r25, 0x00	; 0
- 6a6:	94 d0       	rcall	.+296    	; 0x7d0 <__udivmodsi4>
+ 6a6:	92 d0       	rcall	.+292    	; 0x7cc <__udivmodsi4>
  6a8:	89 01       	movw	r16, r18
  6aa:	9a 01       	movw	r18, r20
  6ac:	80 2f       	mov	r24, r16
  6ae:	81 50       	subi	r24, 0x01	; 1
  6b0:	89 b9       	out	0x09, r24	; 9
  6b2:	01 50       	subi	r16, 0x01	; 1
+	UBRRH = (BAUD_PRESCALE(buadrate) >> 8);
  6b4:	10 40       	sbci	r17, 0x00	; 0
  6b6:	20 40       	sbci	r18, 0x00	; 0
  6b8:	30 40       	sbci	r19, 0x00	; 0
@@ -1225,55 +1245,118 @@ static uint8_t sm_state_init( void )
  6c0:	33 27       	eor	r19, r19
  6c2:	00 bd       	out	0x20, r16	; 32
  6c4:	88 e1       	ldi	r24, 0x18	; 24
+
+	// Enable receiver and transmitter
+	//UCSRB = ((1<<TXEN)|(1<<RXEN) | (1<<RXCIE));
+	UCSRB = ((1<<TXEN)|(1<<RXEN));
  6c6:	8a b9       	out	0x0a, r24	; 10
  6c8:	1f 91       	pop	r17
+
+	//UCSRC = (1 << URSEL) | (1 << UCSZ0) | (1 << UCSZ1); // Use 8-bit character sizes
+}
  6ca:	0f 91       	pop	r16
  6cc:	08 95       	ret
 
 000006ce <uart_write_char>:
  6ce:	5d 9b       	sbis	0x0b, 5	; 11
+
+/*! output a single character */
+void uart_write_char( char c )
+{
+	while ((UCSRA & (1 << UDRE)) == 0) {}; //wait for last TX char to exit
  6d0:	fe cf       	rjmp	.-4      	; 0x6ce <uart_write_char>
+	UDR = c;
  6d2:	8c b9       	out	0x0c, r24	; 12
+}
  6d4:	08 95       	ret
 
 000006d6 <uart_write_string>:
+
+/*! output a text string until end of string is reached  */
+void uart_write_string( char *str )
+{
  6d6:	cf 93       	push	r28
  6d8:	df 93       	push	r29
  6da:	ec 01       	movw	r28, r24
+	while(*str != '\0') {
  6dc:	88 81       	ld	r24, Y
  6de:	88 23       	and	r24, r24
  6e0:	29 f0       	breq	.+10     	; 0x6ec <uart_write_string+0x16>
+	while ((UCSRA & (1 << UDRE)) == 0) {}; //wait for last TX char to exit
+	UDR = c;
+}
+
+/*! output a text string until end of string is reached  */
+void uart_write_string( char *str )
  6e2:	21 96       	adiw	r28, 0x01	; 1
+{
+	while(*str != '\0') {
+		uart_write_char(*str);
  6e4:	f4 df       	rcall	.-24     	; 0x6ce <uart_write_char>
  6e6:	89 91       	ld	r24, Y+
+}
+
+/*! output a text string until end of string is reached  */
+void uart_write_string( char *str )
+{
+	while(*str != '\0') {
  6e8:	88 23       	and	r24, r24
  6ea:	e1 f7       	brne	.-8      	; 0x6e4 <uart_write_string+0xe>
  6ec:	df 91       	pop	r29
+		uart_write_char(*str);
+		str++;
+	}
+}
  6ee:	cf 91       	pop	r28
  6f0:	08 95       	ret
 
 000006f2 <uart_print_byte>:
  6f2:	cf 93       	push	r28
+
+/*! convert a byte to string and output */
+void uart_print_byte( uint8_t b )
+{
  6f4:	df 93       	push	r29
  6f6:	00 d0       	rcall	.+0      	; 0x6f8 <uart_print_byte+0x6>
  6f8:	00 d0       	rcall	.+0      	; 0x6fa <uart_print_byte+0x8>
  6fa:	cd b7       	in	r28, 0x3d	; 61
  6fc:	de b7       	in	r29, 0x3e	; 62
+	char tmp[4];
+	int i = sizeof(tmp) - 1;
+
+	// Convert the given number to an ASCII decimal representation.
+	tmp[i] = '\0';
  6fe:	1c 82       	std	Y+4, r1	; 0x04
  700:	fe 01       	movw	r30, r28
  702:	34 96       	adiw	r30, 0x04	; 4
+
+/*! convert a byte to string and output */
+void uart_print_byte( uint8_t b )
+{
+	char tmp[4];
+	int i = sizeof(tmp) - 1;
  704:	23 e0       	ldi	r18, 0x03	; 3
  706:	30 e0       	ldi	r19, 0x00	; 0
+
+	// Convert the given number to an ASCII decimal representation.
+	tmp[i] = '\0';
+	do {
+		tmp[--i] = '0' + b % 10;
  708:	4a e0       	ldi	r20, 0x0A	; 10
  70a:	21 50       	subi	r18, 0x01	; 1
  70c:	30 40       	sbci	r19, 0x00	; 0
  70e:	64 2f       	mov	r22, r20
- 710:	53 d0       	rcall	.+166    	; 0x7b8 <__udivmodqi4>
+ 710:	51 d0       	rcall	.+162    	; 0x7b4 <__udivmodqi4>
  712:	90 5d       	subi	r25, 0xD0	; 208
  714:	92 93       	st	-Z, r25
  716:	88 23       	and	r24, r24
+		b /= 10;
+	} while(b);
  718:	c1 f7       	brne	.-16     	; 0x70a <uart_print_byte+0x18>
  71a:	81 e0       	ldi	r24, 0x01	; 1
+
+	// Transmit the resulting string with the given USART.
+	uart_write_string(tmp + i);
  71c:	90 e0       	ldi	r25, 0x00	; 0
  71e:	8c 0f       	add	r24, r28
  720:	9d 1f       	adc	r25, r29
@@ -1282,6 +1365,7 @@ static uint8_t sm_state_init( void )
  726:	d7 df       	rcall	.-82     	; 0x6d6 <uart_write_string>
  728:	0f 90       	pop	r0
  72a:	0f 90       	pop	r0
+}
  72c:	0f 90       	pop	r0
  72e:	0f 90       	pop	r0
  730:	df 91       	pop	r29
@@ -1291,11 +1375,23 @@ static uint8_t sm_state_init( void )
 00000736 <uart_print_byte_hex>:
  736:	cf 93       	push	r28
  738:	df 93       	push	r29
+
+/*! convert a byte to hex and output */
+void uart_print_byte_hex( uint8_t b )
+{
  73a:	00 d0       	rcall	.+0      	; 0x73c <uart_print_byte_hex+0x6>
  73c:	0f 92       	push	r0
  73e:	cd b7       	in	r28, 0x3d	; 61
  740:	de b7       	in	r29, 0x3e	; 62
+	char tmp[3];
+	int i;
+
+	// Convert the given number to an ASCII hexadecimal representation.
+	tmp[2] = '\0';
  742:	1b 82       	std	Y+3, r1	; 0x03
+	for (i = 1; i >= 0; i--)
+	{
+		tmp[i] = HEX_DIGITS[b & 0xF];
  744:	98 2f       	mov	r25, r24
  746:	9f 70       	andi	r25, 0x0F	; 15
  748:	29 ef       	ldi	r18, 0xF9	; 249
@@ -1305,135 +1401,163 @@ static uint8_t sm_state_init( void )
  750:	f1 1d       	adc	r31, r1
  752:	90 81       	ld	r25, Z
  754:	9a 83       	std	Y+2, r25	; 0x02
+		b >>= 4;
  756:	82 95       	swap	r24
  758:	8f 70       	andi	r24, 0x0F	; 15
+
+	// Convert the given number to an ASCII hexadecimal representation.
+	tmp[2] = '\0';
+	for (i = 1; i >= 0; i--)
+	{
+		tmp[i] = HEX_DIGITS[b & 0xF];
  75a:	28 0f       	add	r18, r24
  75c:	31 1d       	adc	r19, r1
  75e:	f9 01       	movw	r30, r18
  760:	80 81       	ld	r24, Z
  762:	89 83       	std	Y+1, r24	; 0x01
+		b >>= 4;
+	}
+
+	// Transmit the resulting string with the given USART.
+	uart_write_string(tmp);
  764:	ce 01       	movw	r24, r28
  766:	01 96       	adiw	r24, 0x01	; 1
  768:	b6 df       	rcall	.-148    	; 0x6d6 <uart_write_string>
  76a:	0f 90       	pop	r0
+}
  76c:	0f 90       	pop	r0
  76e:	0f 90       	pop	r0
  770:	df 91       	pop	r29
  772:	cf 91       	pop	r28
  774:	08 95       	ret
 
-00000776 <board_init>:
- 776:	8a dc       	rcall	.-1772   	; 0x8c <sysclk_init>
- 778:	80 ef       	ldi	r24, 0xF0	; 240
- 77a:	81 bb       	out	0x11, r24	; 17
- 77c:	12 ba       	out	0x12, r1	; 18
- 77e:	87 bb       	out	0x17, r24	; 23
- 780:	18 ba       	out	0x18, r1	; 24
- 782:	8f e0       	ldi	r24, 0x0F	; 15
- 784:	8b bb       	out	0x1b, r24	; 27
- 786:	08 95       	ret
+00000776 <main>:
+}
 
-00000788 <main>:
-
-#define BAUDRATE 38400
-
+/*! main start */
 int main (void)
 {
 	cpu_irq_disable();
- 788:	f8 94       	cli
-	board_init();
- 78a:	f5 df       	rcall	.-22     	; 0x776 <board_init>
- 78c:	80 e0       	ldi	r24, 0x00	; 0
+ 776:	f8 94       	cli
+	sysclk_init();
+ 778:	89 dc       	rcall	.-1774   	; 0x8c <sysclk_init>
+ 77a:	80 ef       	ldi	r24, 0xF0	; 240
+#define BAUDRATE 38400 //! Serial port baudrate for debugging
+
+static void port_init( void )
+{
+	// relay output pins - PD4-7
+	DDRD = 0xf0;
+ 77c:	81 bb       	out	0x11, r24	; 17
+ 77e:	12 ba       	out	0x12, r1	; 18
+	PORTD = 0x00;
+ 780:	87 bb       	out	0x17, r24	; 23
+
+	// LEDs output pins - PB4-7
+	DDRB = 0xf0;
+ 782:	18 ba       	out	0x18, r1	; 24
+	PORTB = 0x00;
+ 784:	8f e0       	ldi	r24, 0x0F	; 15
+
+	// PA0-3 digital inputs - enable pull ups
+	PORTA = 0x0f;
+ 786:	8b bb       	out	0x1b, r24	; 27
+ 788:	80 e0       	ldi	r24, 0x00	; 0
+int main (void)
+{
+	cpu_irq_disable();
+	sysclk_init();
+	port_init();
 	uart_init(BAUDRATE);
- 78e:	96 e9       	ldi	r25, 0x96	; 150
- 790:	70 df       	rcall	.-288    	; 0x672 <uart_init>
- 792:	da dd       	rcall	.-1100   	; 0x348 <rtc_init>
- 794:	9d dd       	rcall	.-1222   	; 0x2d0 <relays_init>
+ 78a:	96 e9       	ldi	r25, 0x96	; 150
+ 78c:	72 df       	rcall	.-284    	; 0x672 <uart_init>
+ 78e:	dc dd       	rcall	.-1096   	; 0x348 <rtc_init>
+ 790:	9f dd       	rcall	.-1218   	; 0x2d0 <relays_init>
 	rtc_init();
- 796:	7b dc       	rcall	.-1802   	; 0x8e <inputs_init>
- 798:	8a ea       	ldi	r24, 0xAA	; 170
+ 792:	7d dc       	rcall	.-1798   	; 0x8e <inputs_init>
+ 794:	8a ea       	ldi	r24, 0xAA	; 170
 	relays_init();
- 79a:	90 e0       	ldi	r25, 0x00	; 0
- 79c:	9c df       	rcall	.-200    	; 0x6d6 <uart_write_string>
+ 796:	90 e0       	ldi	r25, 0x00	; 0
+ 798:	9e df       	rcall	.-196    	; 0x6d6 <uart_write_string>
 	inputs_init();
- 79e:	8f ec       	ldi	r24, 0xCF	; 207
- 7a0:	90 e0       	ldi	r25, 0x00	; 0
+ 79a:	8f ec       	ldi	r24, 0xCF	; 207
+ 79c:	90 e0       	ldi	r25, 0x00	; 0
 	uart_write_string("Garage Door Controller Starting...\r\n");
- 7a2:	99 df       	rcall	.-206    	; 0x6d6 <uart_write_string>
- 7a4:	47 de       	rcall	.-882    	; 0x434 <sm_init>
- 7a6:	de dd       	rcall	.-1092   	; 0x364 <rtc_start>
- 7a8:	78 94       	sei
+ 79e:	9b df       	rcall	.-202    	; 0x6d6 <uart_write_string>
+ 7a0:	49 de       	rcall	.-878    	; 0x434 <sm_init>
+ 7a2:	e0 dd       	rcall	.-1088   	; 0x364 <rtc_start>
+ 7a4:	78 94       	sei
 	uart_write_string("Version 1.0\r\n");
- 7aa:	8d ed       	ldi	r24, 0xDD	; 221
- 7ac:	90 e0       	ldi	r25, 0x00	; 0
- 7ae:	93 df       	rcall	.-218    	; 0x6d6 <uart_write_string>
- 7b0:	e1 dd       	rcall	.-1086   	; 0x374 <rtc_service>
+ 7a6:	8d ed       	ldi	r24, 0xDD	; 221
+ 7a8:	90 e0       	ldi	r25, 0x00	; 0
+ 7aa:	95 df       	rcall	.-214    	; 0x6d6 <uart_write_string>
+ 7ac:	e3 dd       	rcall	.-1082   	; 0x374 <rtc_service>
 	sm_init();
- 7b2:	80 e0       	ldi	r24, 0x00	; 0
- 7b4:	90 e0       	ldi	r25, 0x00	; 0
+ 7ae:	80 e0       	ldi	r24, 0x00	; 0
+ 7b0:	90 e0       	ldi	r25, 0x00	; 0
 	rtc_start();
- 7b6:	08 95       	ret
+ 7b2:	08 95       	ret
 
-000007b8 <__udivmodqi4>:
- 7b8:	99 1b       	sub	r25, r25
- 7ba:	79 e0       	ldi	r23, 0x09	; 9
- 7bc:	04 c0       	rjmp	.+8      	; 0x7c6 <__udivmodqi4_ep>
+000007b4 <__udivmodqi4>:
+ 7b4:	99 1b       	sub	r25, r25
+ 7b6:	79 e0       	ldi	r23, 0x09	; 9
+ 7b8:	04 c0       	rjmp	.+8      	; 0x7c2 <__udivmodqi4_ep>
 
-000007be <__udivmodqi4_loop>:
- 7be:	99 1f       	adc	r25, r25
- 7c0:	96 17       	cp	r25, r22
- 7c2:	08 f0       	brcs	.+2      	; 0x7c6 <__udivmodqi4_ep>
- 7c4:	96 1b       	sub	r25, r22
+000007ba <__udivmodqi4_loop>:
+ 7ba:	99 1f       	adc	r25, r25
+ 7bc:	96 17       	cp	r25, r22
+ 7be:	08 f0       	brcs	.+2      	; 0x7c2 <__udivmodqi4_ep>
+ 7c0:	96 1b       	sub	r25, r22
 
-000007c6 <__udivmodqi4_ep>:
- 7c6:	88 1f       	adc	r24, r24
- 7c8:	7a 95       	dec	r23
- 7ca:	c9 f7       	brne	.-14     	; 0x7be <__udivmodqi4_loop>
- 7cc:	80 95       	com	r24
- 7ce:	08 95       	ret
+000007c2 <__udivmodqi4_ep>:
+ 7c2:	88 1f       	adc	r24, r24
+ 7c4:	7a 95       	dec	r23
+ 7c6:	c9 f7       	brne	.-14     	; 0x7ba <__udivmodqi4_loop>
+ 7c8:	80 95       	com	r24
+ 7ca:	08 95       	ret
 
-000007d0 <__udivmodsi4>:
- 7d0:	a1 e2       	ldi	r26, 0x21	; 33
- 7d2:	1a 2e       	mov	r1, r26
- 7d4:	aa 1b       	sub	r26, r26
- 7d6:	bb 1b       	sub	r27, r27
- 7d8:	fd 01       	movw	r30, r26
- 7da:	0d c0       	rjmp	.+26     	; 0x7f6 <__udivmodsi4_ep>
+000007cc <__udivmodsi4>:
+ 7cc:	a1 e2       	ldi	r26, 0x21	; 33
+ 7ce:	1a 2e       	mov	r1, r26
+ 7d0:	aa 1b       	sub	r26, r26
+ 7d2:	bb 1b       	sub	r27, r27
+ 7d4:	fd 01       	movw	r30, r26
+ 7d6:	0d c0       	rjmp	.+26     	; 0x7f2 <__udivmodsi4_ep>
 
-000007dc <__udivmodsi4_loop>:
- 7dc:	aa 1f       	adc	r26, r26
- 7de:	bb 1f       	adc	r27, r27
- 7e0:	ee 1f       	adc	r30, r30
- 7e2:	ff 1f       	adc	r31, r31
- 7e4:	a2 17       	cp	r26, r18
- 7e6:	b3 07       	cpc	r27, r19
- 7e8:	e4 07       	cpc	r30, r20
- 7ea:	f5 07       	cpc	r31, r21
- 7ec:	20 f0       	brcs	.+8      	; 0x7f6 <__udivmodsi4_ep>
- 7ee:	a2 1b       	sub	r26, r18
- 7f0:	b3 0b       	sbc	r27, r19
- 7f2:	e4 0b       	sbc	r30, r20
- 7f4:	f5 0b       	sbc	r31, r21
+000007d8 <__udivmodsi4_loop>:
+ 7d8:	aa 1f       	adc	r26, r26
+ 7da:	bb 1f       	adc	r27, r27
+ 7dc:	ee 1f       	adc	r30, r30
+ 7de:	ff 1f       	adc	r31, r31
+ 7e0:	a2 17       	cp	r26, r18
+ 7e2:	b3 07       	cpc	r27, r19
+ 7e4:	e4 07       	cpc	r30, r20
+ 7e6:	f5 07       	cpc	r31, r21
+ 7e8:	20 f0       	brcs	.+8      	; 0x7f2 <__udivmodsi4_ep>
+ 7ea:	a2 1b       	sub	r26, r18
+ 7ec:	b3 0b       	sbc	r27, r19
+ 7ee:	e4 0b       	sbc	r30, r20
+ 7f0:	f5 0b       	sbc	r31, r21
 
-000007f6 <__udivmodsi4_ep>:
- 7f6:	66 1f       	adc	r22, r22
- 7f8:	77 1f       	adc	r23, r23
- 7fa:	88 1f       	adc	r24, r24
- 7fc:	99 1f       	adc	r25, r25
- 7fe:	1a 94       	dec	r1
- 800:	69 f7       	brne	.-38     	; 0x7dc <__udivmodsi4_loop>
- 802:	60 95       	com	r22
- 804:	70 95       	com	r23
- 806:	80 95       	com	r24
- 808:	90 95       	com	r25
- 80a:	9b 01       	movw	r18, r22
- 80c:	ac 01       	movw	r20, r24
- 80e:	bd 01       	movw	r22, r26
- 810:	cf 01       	movw	r24, r30
- 812:	08 95       	ret
+000007f2 <__udivmodsi4_ep>:
+ 7f2:	66 1f       	adc	r22, r22
+ 7f4:	77 1f       	adc	r23, r23
+ 7f6:	88 1f       	adc	r24, r24
+ 7f8:	99 1f       	adc	r25, r25
+ 7fa:	1a 94       	dec	r1
+ 7fc:	69 f7       	brne	.-38     	; 0x7d8 <__udivmodsi4_loop>
+ 7fe:	60 95       	com	r22
+ 800:	70 95       	com	r23
+ 802:	80 95       	com	r24
+ 804:	90 95       	com	r25
+ 806:	9b 01       	movw	r18, r22
+ 808:	ac 01       	movw	r20, r24
+ 80a:	bd 01       	movw	r22, r26
+ 80c:	cf 01       	movw	r24, r30
+ 80e:	08 95       	ret
 
-00000814 <_exit>:
- 814:	f8 94       	cli
+00000810 <_exit>:
+ 810:	f8 94       	cli
 
-00000816 <__stop_program>:
- 816:	ff cf       	rjmp	.-2      	; 0x816 <__stop_program>
+00000812 <__stop_program>:
+ 812:	ff cf       	rjmp	.-2      	; 0x812 <__stop_program>

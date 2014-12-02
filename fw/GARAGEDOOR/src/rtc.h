@@ -5,7 +5,8 @@
  *
  * \brief RTC scheduler header file
  *
- * Copyright (C) 2014 Jan Zwiegers, jan@radialsystems.co.za
+ * Copyright (C) 2014 Radical Electronic Systems
+ * Written by Jan Zwiegers, jan@radialsystems.co.za
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

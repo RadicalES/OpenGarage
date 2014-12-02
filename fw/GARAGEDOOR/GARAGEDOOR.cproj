@@ -247,9 +247,6 @@
     <None Include="src\asf\common\services\ioport\mega\ioport.h">
       <SubType>compile</SubType>
     </None>
-    <Compile Include="src\asf\mega\boards\stk600\rcx_x\init.c">
-      <SubType>compile</SubType>
-    </Compile>
     <None Include="src\asf\mega\drivers\cpu\mega_reset_cause.h">
       <SubType>compile</SubType>
     </None>
@@ -314,9 +311,6 @@
     <Folder Include="src\asf\common\utils\interrupt\" />
     <Folder Include="src\asf\common\utils\make\" />
     <Folder Include="src\asf\mega\" />
-    <Folder Include="src\asf\mega\boards\" />
-    <Folder Include="src\asf\mega\boards\stk600\" />
-    <Folder Include="src\asf\mega\boards\stk600\rcx_x\" />
     <Folder Include="src\asf\mega\drivers\" />
     <Folder Include="src\asf\mega\drivers\cpu\" />
     <Folder Include="src\asf\mega\utils\" />

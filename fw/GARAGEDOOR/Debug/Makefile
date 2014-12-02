@@ -48,9 +48,6 @@ SUBDIRS :=  \
 ../src/asf/common/utils/interrupt/ \
 ../src/asf/common/utils/make/ \
 ../src/asf/mega/ \
-../src/asf/mega/boards/ \
-../src/asf/mega/boards/stk600/ \
-../src/asf/mega/boards/stk600/rcx_x/ \
 ../src/asf/mega/drivers/ \
 ../src/asf/mega/drivers/cpu/ \
 ../src/asf/mega/utils/ \
@@ -66,7 +63,6 @@ C_SRCS +=  \
 ../src/rtc.c \
 ../src/sm.c \
 ../src/uart.c \
-../src/asf/mega/boards/stk600/rcx_x/init.c \
 ../src/main.c
 
 
@@ -83,7 +79,6 @@ src/relays.o \
 src/rtc.o \
 src/sm.o \
 src/uart.o \
-src/asf/mega/boards/stk600/rcx_x/init.o \
 src/main.o
 
 
@@ -94,7 +89,6 @@ src/relays.o \
 src/rtc.o \
 src/sm.o \
 src/uart.o \
-src/asf/mega/boards/stk600/rcx_x/init.o \
 src/main.o
 
 
@@ -105,7 +99,6 @@ src/relays.d \
 src/rtc.d \
 src/sm.d \
 src/uart.d \
-src/asf/mega/boards/stk600/rcx_x/init.d \
 src/main.d
 
 
@@ -116,7 +109,6 @@ src/relays.d \
 src/rtc.d \
 src/sm.d \
 src/uart.d \
-src/asf/mega/boards/stk600/rcx_x/init.d \
 src/main.d
 
 
@@ -144,8 +136,6 @@ OUTPUT_FILE_DEP:= ./makedep.mk
 
 
 
-
-
 src/asf/common/services/clock/mega/%.o: ../src/asf/common/services/clock/mega/%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : (AVR_8_bit_GNU_Toolchain_3.4.1_830) 4.6.2
@@ -153,12 +143,6 @@ src/asf/common/services/clock/mega/%.o: ../src/asf/common/services/clock/mega/%.
 	@echo Finished building: $<
 
 src/%.o: ../src/%.c
-	@echo Building file: $<
-	@echo Invoking: AVR/GNU C Compiler : (AVR_8_bit_GNU_Toolchain_3.4.1_830) 4.6.2
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Studio 6.0\extensions\Atmel\AVRGCC\3.4.1.95\AVRToolchain\bin\avr-gcc.exe$(QUOTE) -DBOARD=STK600_MEGA  -I"../src" -I"../src/asf/common/applications/user_application/atmega16_stk600-mega" -I"../src/asf/common/boards" -I"../src/asf/common/utils" -I"../src/asf/mega/utils" -I"../src/config" -I"../src/asf/mega/drivers/cpu" -I"../src/asf/common/services/clock" -I"../src/asf/common/services/delay" -I"../src/asf/common/services/gpio" -I"../src/asf/common/services/ioport"  -O1 -fdata-sections -ffunction-sections -g3 -Wall -c -Werror-implicit-function-declaration -Wmissing-prototypes -Wpointer-arith -Wstrict-prototypes -mrelax -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"  -mmcu=atmega16a   -o"$@" "$<" 
-	@echo Finished building: $<
-
-src/asf/mega/boards/stk600/rcx_x/%.o: ../src/asf/mega/boards/stk600/rcx_x/%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : (AVR_8_bit_GNU_Toolchain_3.4.1_830) 4.6.2
 	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Studio 6.0\extensions\Atmel\AVRGCC\3.4.1.95\AVRToolchain\bin\avr-gcc.exe$(QUOTE) -DBOARD=STK600_MEGA  -I"../src" -I"../src/asf/common/applications/user_application/atmega16_stk600-mega" -I"../src/asf/common/boards" -I"../src/asf/common/utils" -I"../src/asf/mega/utils" -I"../src/config" -I"../src/asf/mega/drivers/cpu" -I"../src/asf/common/services/clock" -I"../src/asf/common/services/delay" -I"../src/asf/common/services/gpio" -I"../src/asf/common/services/ioport"  -O1 -fdata-sections -ffunction-sections -g3 -Wall -c -Werror-implicit-function-declaration -Wmissing-prototypes -Wpointer-arith -Wstrict-prototypes -mrelax -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"  -mmcu=atmega16a   -o"$@" "$<" 
