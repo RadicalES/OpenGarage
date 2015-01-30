@@ -1,7 +1,7 @@
 # OpenGarage
 
 Open Source Automatic Garage Door Controller
-By making use of Radical's ROBOT-T101 controller.
+By making use of Radical's ROBOT-S101 controller.
 
 ## **Specifications**
 * Voltage Input      : 8 - 30V DC
